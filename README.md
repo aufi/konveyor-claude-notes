@@ -20,6 +20,31 @@ go-konveyor-tests | https://github.com/konveyor/go-konveyor-tests | API test sui
 kantra-cli-tests | https://github.com/konveyor-ecosystem/kantra-cli-tests | CLI test suite
 enhancements | https://github.com/konveyor/enhancements | Konveyor documentation of new features, check open PRs to get currently open features
 
+## AI Agents (experimental, PoC)
+
+### CI Debugger Agent
+
+Experiment created as part of day of learning Q3 2025.
+
+An intelligent AI agent that automatically debugs GitHub Actions workflow failures and proposes fixes using OpenAI GPT-4.
+
+**Location**: [agent-ci-debugger/](agent-ci-debugger/)
+
+**Features**:
+- Fetches workflow run data from GitHub Actions using GitHub CLI
+- Parses and analyzes failed job logs
+- Uses OpenAI GPT-4o-mini (configurable) to identify root causes and propose fixes
+- Generates comprehensive reports with actionable recommendations
+
+**Quick Start**:
+```bash
+cd agent-ci-debugger
+export OPENAI_API_KEY="your-api-key"
+./example-usage.sh https://github.com/konveyor/ci/actions/runs/RUNID
+```
+
+See [agent-ci-debugger/README.md](agent-ci-debugger/README.md) for detailed documentation.
+
 ## Locally running Konveyor
 
 To run Konveyor locally, you can use the hub repository which provides convenient make targets for setting up minikube and installing Tackle.
