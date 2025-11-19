@@ -113,6 +113,8 @@ kubectl apply -f custom-tackle-cr.yaml
 
 ## Running tests
 
+For resting high level overview, responsibilities and kind of tests Konveyor uses, check https://github.com/konveyor/enhancements/blob/master/enhancements/tackle/testing/testing-responsibilities.md
+
 ### API E2E tests
 
 Stored in `go-konveyor-tests` repository, executed from Makefile `make test-tier0`, there are tiers 0, 1 and 2. Tests need point to `hub` path from Konveyor installation with `HUB_BASE_URL` environment variable. By default, use `KEEP=1` and `DEBUG=1` to provide more details on the test run.
