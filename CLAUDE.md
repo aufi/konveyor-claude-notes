@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is claude-notes, a documentation and tooling repository for the Konveyor community. Konveyor is a toolkit for application analysis and modernization, helping developers migrate applications between platforms and frameworks.
 
+This repository should be cloned to `~/go/src/github.com/konveyor/` alongside other Konveyor component repositories. When working with Konveyor components, execute `claude` from this directory to provide Claude Code with comprehensive context about the entire Konveyor ecosystem.
+
 ## Konveyor Ecosystem Architecture
 
 The Konveyor project consists of multiple interconnected components in sibling directories:
@@ -15,8 +17,11 @@ The Konveyor project consists of multiple interconnected components in sibling d
 - **operator** - Kubernetes operator for installing and managing Konveyor (Ansible-based)
 - **kantra** - CLI tool for offline application analysis (Go)
 - **analyzer-lsp** - Language Server Protocol implementation for code analysis engine (Go)
-- **go-konveyor-tests** - Integration test suite for end-to-end validation (Go)
+- **go-konveyor-tests** - API E2E integration test suite for Hub (Go)
+- **kantra-cli-tests** - CLI test suite for kantra (Python/pytest)
 - **rulesets** - YAML rule definitions for application analysis patterns
+- **ci** - CI workflows and overall status tracking, nightly jobs execution
+- **enhancements** - Documentation of new features (check open PRs for in-progress features)
 
 ### Component Relationships
 - Hub provides the API and task orchestration layer
@@ -25,6 +30,14 @@ The Konveyor project consists of multiple interconnected components in sibling d
 - Hub uses analyzer-lsp via Kubernetes pod tasks for online analysis
 - Both Hub and Kantra consume rulesets for analysis rules
 - go-konveyor-tests validates the entire stack integration
+- kantra-cli-tests validates kantra CLI functionality
+
+**Understanding Dependencies:**
+To understand relationships between components, examine:
+- `Dockerfile` - Image build dependencies and runtime requirements
+- `go.mod` - Go module dependencies
+- `Makefile` - Build targets and inter-component references
+- `.github/workflows/` - CI processes and release workflows
 
 ## Local Development Setup
 
@@ -43,13 +56,24 @@ make install-tackle    # Installs Konveyor operator and components
 ```
 
 ### Running Tests
+
+#### API E2E Tests (go-konveyor-tests)
 ```bash
-# Run integration tests
 cd ../go-konveyor-tests
 export HUB_BASE_URL="http://$(minikube ip)/hub"
 make test-tier0    # Core functionality tests
 make test-tier1    # Standard feature tests
 make test-tier2    # Advanced feature tests
+# Use KEEP=1 and DEBUG=1 for more details
+KEEP=1 DEBUG=1 make test-tier0
+```
+
+#### Kantra CLI Tests (kantra-cli-tests)
+Tests use pytest and require kantra binary setup. Check `.github/actions/` for required steps.
+```bash
+cd ../kantra-cli-tests
+# Run TIER0 tests
+pytest -s tests/analysis/java/test_tier0.py
 ```
 
 ## Development Workflows
@@ -83,6 +107,19 @@ cd ../operator && make bundle   # Build operator bundle
 cd ../operator && make docker-build    # Build operator image
 cd ../operator && make install # Install via Helm
 cd ../operator && make uninstall # Uninstall via Helm
+```
+
+### Testing Rules and Rulesets
+Direct testing of analyzer and rulesets without full Hub deployment:
+
+```bash
+# Analyzer LSP testing
+cd ../analyzer-lsp
+# Check demo-testing.yml GitHub workflow for example commands
+
+# Rulesets testing
+cd ../rulesets
+# Check local-ci.yaml for test commands to run locally
 ```
 
 ### Testing Custom Images
@@ -167,3 +204,39 @@ cd ../operator && make docker-build IMG=your-registry/operator:tag
 cd ../hub && make docker-push IMG=your-registry/hub:tag
 cd ../operator && make docker-push IMG=your-registry/operator:tag
 ```
+
+## Experimental Tools
+
+### CI Debugger Agent (agent-ci-debugger/)
+AI-powered tool that automatically analyzes GitHub Actions workflow failures and proposes fixes using OpenAI GPT-4.
+
+**Quick Start:**
+```bash
+cd agent-ci-debugger
+export OPENAI_API_KEY="your-api-key"
+go build -o github-workflow-debugger github-workflow-debugger.go
+
+# Analyze a failed workflow
+./github-workflow-debugger https://github.com/konveyor/ci/actions/runs/RUNID
+
+# Or use the convenience script
+./example-usage.sh https://github.com/konveyor/ci/actions/runs/RUNID
+```
+
+**Features:**
+- Fetches workflow data via GitHub CLI (`gh`)
+- Extracts error patterns, timeouts, and failed tests
+- Uses GPT-4o-mini (default) or GPT-4o for analysis
+- Generates markdown reports with root cause and fix proposals
+- Handles large logs with intelligent filtering
+
+**Configuration:**
+```bash
+# Use better quality model (higher cost)
+export OPENAI_MODEL="gpt-4o"
+
+# Default (cost-effective)
+export OPENAI_MODEL="gpt-4o-mini"
+```
+
+See `agent-ci-debugger/README.md` for detailed documentation.
