@@ -1,3 +1,11 @@
+# Setup
+```
+$ cd ~/go/src/github.com/konveyor
+$ git clone https://github.com/aufi/konveyor-claude-notes && cd konveyor-claude-notes
+
+$ claude # Now you can ask for Konveyor local setup, run E2E tests, debug failures, etc.
+```
+
 # Claude notes
 
 This repository should provide tooling and help for Konveyor community focusing on developers. Konveyor provides a toolkit for application analysis to help modernize them.
